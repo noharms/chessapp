@@ -1,11 +1,10 @@
 package com.chess.controller;
 
+import com.chess.gui.BoardPanel;
 import com.chess.gui.MainFrame;
-import com.chess.model.Coordinates;
-import com.chess.model.Game;
-import com.chess.model.GameUtils;
-import com.chess.model.PieceConfig;
+import com.chess.model.*;
 
+import java.util.List;
 import java.util.Set;
 
 public class Controller {
@@ -23,12 +22,32 @@ public class Controller {
     return (game.getBoard().getPieceAtCoordinates(row, col) != null);
   }
 
-  public PieceConfig getPieceAtCoors(int row, int col) {
-    return game.getBoard().getPieceAtCoordinates(row, col);
+  public PieceConfig getPieceAtCoors(Coordinates coors) {
+    return game.getBoard().getPieceAtCoordinates(coors);
   }
 
-  public Set<Coordinates> getValidDestinations(int src_row, int src_col) {
-    return game.computeValidDestinationCoors(src_row, src_col);
+  public Player getPlayerToMove() {
+    return game.getPlayerToMove();
+  }
+
+  public Set<Coordinates> getValidDestinations(Coordinates srcCoors) {
+    return game.computeValidDestinationCoors(srcCoors);
+  }
+
+  public Set<Move> getValidMoves(Coordinates srcCoors) {
+    return game.computeValidMoves(srcCoors);
+  }
+
+  public void applySelectedMove() {
+    BoardPanel boardPanel = mainFrame.getBoardPanel();
+    Move selectedMove = boardPanel.getSelectedMove();
+    if (selectedMove != null) {
+      game.applyMove(selectedMove);
+      boardPanel.setSelectedMove(null);
+      boardPanel.setSelectedSourceTile(null);
+      boardPanel.setSelectedDestinationTile(null);
+    }
+    mainFrame.visualiseGame(game);
   }
 
   //------------------- GUI control
@@ -56,4 +75,5 @@ public class Controller {
   public void setMainFrame(MainFrame mainFrame) {
     this.mainFrame = mainFrame;
   }
+
 }

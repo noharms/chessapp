@@ -1,11 +1,8 @@
 package com.chess.model;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  *  TODO: refactor this class... artifact from Codewars (e.g. use Coordinate class)
+ *
  *
  *  Note: all members are final, so after instantiasation one can only
  *        read the members but never change them

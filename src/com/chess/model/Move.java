@@ -1,44 +1,29 @@
 package com.chess.model;
 
-public class Move {
-  private final Coordinates oldPos;
-  private final Coordinates newPos;
+public class Move extends SrcDstCoordinates {
   private final boolean isAttack;
   private final boolean isEnPassantAttack;
 
-  public Move(int rowNew, int colNew, int rowOld, int colOld, boolean isAttack) {
-    newPos = new Coordinates(rowNew, colNew);
-    oldPos = new Coordinates(rowOld, colOld);
-    this.isAttack = isAttack;
-    this.isEnPassantAttack = false;
-  }
   public Move(Coordinates coorsNew, Coordinates coorsOld, boolean isAttack) {
-    newPos = new Coordinates(coorsNew);
-    oldPos = new Coordinates(coorsOld);
+    super(coorsNew, coorsOld);
     this.isAttack = isAttack;
     this.isEnPassantAttack = false;
-  }
-  public Move(int rowNew, int colNew, int rowOld, int colOld, boolean isAttack, boolean isEnPassantAttack) {
-    newPos = new Coordinates(rowNew, colNew);
-    oldPos = new Coordinates(rowOld, colOld);
-    this.isAttack = isAttack;
-    this.isEnPassantAttack = isEnPassantAttack;
   }
   public Move(Coordinates coorsNew, Coordinates coorsOld, boolean isAttack, boolean isEnPassantAttack) {
-    newPos = new Coordinates(coorsNew);
-    oldPos = new Coordinates(coorsOld);
+    super(coorsNew, coorsOld);
     this.isAttack = isAttack;
     this.isEnPassantAttack = isEnPassantAttack;
+  }
+
+  public Move(Move other) {
+    super(other.newPos, other.oldPos);
+    this.isAttack = other.isAttack;
+    this.isEnPassantAttack = other.isEnPassantAttack;
   }
 
   public boolean isAttack() { return isAttack; }
   public boolean isEnPassantAttack() { return isEnPassantAttack; }
-  public Coordinates getNewPos() {
-    return newPos;
-  }
-  public Coordinates getOldPos() {
-    return oldPos;
-  }
+
 
   @Override
   public int hashCode() {
@@ -74,8 +59,4 @@ public class Move {
     return true;
   }
 
-  @Override
-  public String toString() {
-    return super.toString();
-  }
 }

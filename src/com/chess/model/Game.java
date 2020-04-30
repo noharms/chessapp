@@ -51,19 +51,29 @@ public class Game {
     board.print();
   }
 
-  public boolean makeMove(Move move) {
-    // TODO
-    // switch player to move
-    return false;
+  public void applyMove(Move selectedMove) {
+    PieceConfig pieceConfig = board.getPieceAtCoordinates(selectedMove.getOldPos());
+    if (pieceConfig == null) {
+      throw new RuntimeException("Invalid Move for given board.");
+    }
+    board = new Board(board, pieceConfig, selectedMove);
+    playerToMove = (playerToMove == Player.W ? Player.B : Player.W);
   }
 
   public Set<Coordinates> computeValidDestinationCoors(int src_row, int src_col) {
     PieceConfig pieceConfig = board.getPieceAtCoordinates(src_row, src_col);
+    return EngineMoves.computeValidDstCoordinatesForPiece(board, pieceConfig);
+  }
+  public Set<Coordinates> computeValidDestinationCoors(Coordinates srcCoors) {
+    PieceConfig pieceConfig = board.getPieceAtCoordinates(srcCoors.row, srcCoors.col);
+    return EngineMoves.computeValidDstCoordinatesForPiece(board, pieceConfig);
+  }
+  public Set<Move> computeValidMoves(Coordinates srcCoors) {
+    PieceConfig pieceConfig = board.getPieceAtCoordinates(srcCoors.row, srcCoors.col);
     if (pieceConfig == null) {
       return new HashSet<>();
-    } else {
-      return EngineMoves.computeValidDestinationsForPiece(board, pieceConfig);
     }
+    return EngineMoves.computeValidMovesForPiece(board, pieceConfig);
   }
 
   //--------------------------- Getter and Setter
@@ -86,4 +96,5 @@ public class Game {
   public Player getPlayerToMove() {
     return playerToMove;
   }
+
 }

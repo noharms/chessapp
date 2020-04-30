@@ -1,7 +1,6 @@
 package com.chess.gui;
 
 import com.chess.controller.Controller;
-import com.chess.model.Board;
 import com.chess.model.Game;
 
 import javax.swing.*;
@@ -67,7 +66,18 @@ public class MainFrame extends JFrame {
   }
 
   public void visualiseGame(Game game) {
-    boardPanel.visualiseGame(game);
-    revalidate();
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        System.out.println("Game to visualise:");
+        game.getBoard().print();
+        boardPanel.visualiseBoard(game);
+      }
+    });
+  }
+
+
+  public BoardPanel getBoardPanel() {
+    return boardPanel;
   }
 }

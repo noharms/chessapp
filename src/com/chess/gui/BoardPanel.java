@@ -1,9 +1,7 @@
 package com.chess.gui;
 
 import com.chess.controller.Controller;
-import com.chess.model.Board;
-import com.chess.model.Game;
-import com.chess.model.PieceConfig;
+import com.chess.model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +19,7 @@ public class BoardPanel extends JPanel {
   private final List<TilePanel> boardTiles;
   private TilePanel selectedSourceTile = null;
   private TilePanel selectedDestinationTile = null;
+  private Move selectedMove = null;
 
   public BoardPanel(Controller controller) {
     super(new GridLayout(8, 8)); // TODO: remove magic number 8
@@ -37,17 +36,18 @@ public class BoardPanel extends JPanel {
     validate();
   }
 
-  public void visualiseGame(Game game) {
+  public void visualiseBoard(Game game) {
+    removeAll();
     Board board = game.getBoard();
     for (int r = 0; r < K_DIM; ++r) {
       for (int c = 0; c < K_DIM; ++c) {
-        PieceConfig pieceConfig = board.getPieceAtCoordinates(r, c);
-        if (pieceConfig != null) {
-          TilePanel tilePanel = boardTiles.get(getLinIdx(r, c));
-          tilePanel.setPieceIcon(pieceConfig);
-        }
+        TilePanel tilePanel = boardTiles.get(getLinIdx(r, c));
+        tilePanel.draw(board);
+        this.add(tilePanel);
       }
     }
+    validate();
+    repaint();
   }
 
   public TilePanel getTileAtLinIdx(int linIdx) {
@@ -68,5 +68,13 @@ public class BoardPanel extends JPanel {
 
   public void setSelectedDestinationTile(TilePanel selectedDestinationTile) {
     this.selectedDestinationTile = selectedDestinationTile;
+  }
+
+  public Move getSelectedMove() {
+    return selectedMove;
+  }
+
+  public void setSelectedMove(Move selectedMove) {
+    this.selectedMove = selectedMove;
   }
 }

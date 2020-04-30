@@ -6,7 +6,7 @@ public class Coordinates {
 
   public final int row, col; // row 0 == 8, col 0 == 'a'; row 7 == 1, col 7 == 'h'
 
-  Coordinates(int row, int col) {
+  public Coordinates(int row, int col) {
     this.row = row;
     this.col = col;
   }

@@ -30,8 +30,7 @@ public class EngineIsMate {
     // reaching here, means colorToMove is in check
     // compute all allowed moves of colorToMove and check if there is one move
     // that would put colorToMove out of check
-    Map<PieceConfig, Set<Move>> validMoves =
-            computeValidMovesForPieces(board, piecesOfColorToMove, playerToMove);
+    Map<PieceConfig, Set<Move>> validMoves = computeValidMovesForPieces(board, piecesOfColorToMove);
 
     return validMoves.isEmpty();
   }

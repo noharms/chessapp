@@ -1,9 +1,6 @@
 package com.chess.model;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.chess.model.BoardUtils.*;
 import static com.chess.model.EngineIsCheck.isCheck;
@@ -233,44 +230,45 @@ public class EngineMoves {
   */
   public static Map<PieceConfig, Set<Move>> computeValidMovesForPieces(
           Board board,
-          Set<PieceConfig> piecesToMove,
-          Player playerToMove){
-    // 0. compute potential new positions (not considering whether move would put own king into check)
-    Map<PieceConfig, Set<Move>> piecesOfColorToMove2PotentialMoves =
-            computePotentialMovesForPieces(board, piecesToMove);
-    // 1. filter potential moves to valid moves
-    //    (a move is valid, if afterwards the own king is not in check)
-    Map<PieceConfig, Set<Move>> piecesOfColorToMove2ValidMoves = new HashMap<>();
-    for (Map.Entry<PieceConfig, Set<Move>> entry : piecesOfColorToMove2PotentialMoves.entrySet()) {
-      PieceConfig pieceOfColorToMove = entry.getKey();
-      Set<Move> potentialMoves = entry.getValue();
-      Set<Move> validMoves = new HashSet<>();
-      for (Move hypotheticalMove : potentialMoves) {
-        Board hypotheticalBoard = new Board(board, pieceOfColorToMove, hypotheticalMove);
-        PieceConfig[] allPiecesAfterHypotheticalMove = hypotheticalBoard.buildPiecesArray();
-        Set<PieceConfig> piecesThreateningKing = isCheck(hypotheticalBoard, allPiecesAfterHypotheticalMove, playerToMove);
-        if (piecesThreateningKing.isEmpty()) {
-          validMoves.add(hypotheticalMove);
-        } else {
-          // king is threatened ! hypothetical move is invalid and thus not copied to validMoves set
-        }
-      }
+          Set<PieceConfig> piecesToMove){
+    Map<PieceConfig, Set<Move>> pieces2ValidMoves = new HashMap<>();
+    for (PieceConfig pieceConfig : piecesToMove) {
+      Set<Move> validMoves = computeValidMovesForPiece(board, pieceConfig);
       if (!validMoves.isEmpty()) {
-        piecesOfColorToMove2ValidMoves.put(pieceOfColorToMove, validMoves);
+        pieces2ValidMoves.put(pieceConfig, validMoves);
       }
     }
-    return piecesOfColorToMove2ValidMoves;
+    return pieces2ValidMoves;
   }
 
-  public static Set<Coordinates> computeValidDestinationsForPiece(Board board, PieceConfig pieceConfig) {
-    HashSet<PieceConfig> setOfOnlyOnePiece = new HashSet<>();
-    setOfOnlyOnePiece.add(pieceConfig);
-    Map<PieceConfig, Set<Move>> pieceConfig2Moves =
-            computeValidMovesForPieces(board, setOfOnlyOnePiece, pieceConfig.getPlayer());
+  public static Set<Move> computeValidMovesForPiece(Board board, PieceConfig pieceToMove) {
+    if (board == null || pieceToMove == null) {
+      return null;
+    }
+    Set<Move> potentialMoves = computePotentialMovesForPiece(board, pieceToMove);
+    Set<Move> validMoves = new HashSet<>();
+    for (Move hypotheticalMove : potentialMoves) {
+      Board hypotheticalBoard = new Board(board, pieceToMove, hypotheticalMove);
+      PieceConfig[] allPiecesAfterHypotheticalMove = hypotheticalBoard.buildPiecesArray();
+      Set<PieceConfig> piecesThreateningKing = isCheck(hypotheticalBoard, allPiecesAfterHypotheticalMove, pieceToMove.getPlayer());
+      if (piecesThreateningKing.isEmpty()) {
+        validMoves.add(hypotheticalMove);
+      }
+    }
+    return validMoves;
+  }
+
+  public static Set<Coordinates> computeValidDstCoordinatesForPiece(Board board, PieceConfig pieceConfig) {
+    if (board == null || pieceConfig == null) {
+      return null;
+    }
+    Set<Move> validMoves = computeValidMovesForPiece(board, pieceConfig);
     Set<Coordinates> validDestinationCoors = new HashSet<>();
-    for (Move move : pieceConfig2Moves.get(pieceConfig)) {
-      Coordinates coors = move.getNewPos();
-      validDestinationCoors.add(coors);
+    if (validMoves != null) {
+      for (Move move : validMoves) {
+        Coordinates coors = move.getNewPos();
+        validDestinationCoors.add(coors);
+      }
     }
     return validDestinationCoors;
   }

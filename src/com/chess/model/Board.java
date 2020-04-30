@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.chess.model.BoardUtils.K_DIM;
-import static com.chess.model.BoardUtils.K_WHITE;
 
+// TODO: include valid moves for each contained piece as member, so that each piece knows its moves
+//       or make validMoves a member of PieceConfig or some class extending it
 /**
  * Convention:
  *
@@ -75,6 +76,15 @@ public class Board {
       throw new Error("Unreasonable col index: " + col);
     }
     return board[row][col];
+  }
+  public PieceConfig getPieceAtCoordinates(Coordinates coors) {
+    if (coors.row < 0 || coors.row >= K_DIM) {
+      throw new Error("Unreasonable row index: " + coors.row);
+    }
+    if (coors.col < 0 || coors.col >= K_DIM) {
+      throw new Error("Unreasonable col index: " + coors.col);
+    }
+    return board[coors.row][coors.col];
   }
 
   public void print() {

@@ -1,11 +1,8 @@
 package com.chess.model;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.chess.model.EngineMoves.computePotentialMovesForPieces;
-import static com.chess.model.MovesBasic.*;
-import static com.chess.model.Board.*;
 import static com.chess.model.PieceConfigUtils.getPiecesSameColor;
 
 
