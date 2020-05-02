@@ -4,7 +4,6 @@ import com.chess.gui.BoardPanel;
 import com.chess.gui.MainFrame;
 import com.chess.model.*;
 
-import java.util.List;
 import java.util.Set;
 
 public class Controller {
@@ -43,15 +42,15 @@ public class Controller {
     Move selectedMove = boardPanel.getSelectedMove();
     if (selectedMove != null) {
       game.applyMove(selectedMove);
-      boardPanel.setSelectedMove(null);
       boardPanel.setSelectedSourceTile(null);
-      boardPanel.setSelectedDestinationTile(null);
+      boardPanel.setValidMovesForSelectedPiece(null);
+      boardPanel.setSelectedMove(null);
     }
-    mainFrame.visualiseGame(game);
+    //mainFrame.visualiseGame(game);
   }
 
   //------------------- GUI control
-  // requests to model and update of gui once done
+  // requests to update of gui
   public void visualiseGame() {
     if (mainFrame != null) {
       mainFrame.visualiseGame(game);

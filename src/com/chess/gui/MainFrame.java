@@ -15,9 +15,9 @@ public class MainFrame extends JFrame {
   private Controller controller;
 
   private final JMenuBar menuBar;
+
   private final JMenu fileMenu;
-  private final JMenuItem loadGameMenuItem;
-  private final JMenuItem exitAppMenuItem;
+  private final JMenu preferencesMenu;
 
   private final BoardPanel boardPanel;
 
@@ -35,27 +35,10 @@ public class MainFrame extends JFrame {
 
     // set up menu bar
     menuBar = new JMenuBar();
-    fileMenu =  new JMenu("File");
-
-    loadGameMenuItem = new JMenuItem("Load game");
-    loadGameMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.out.println("TODO: open file from pgn file.");
-      }
-    });
-    fileMenu.add(loadGameMenuItem);
-
-    exitAppMenuItem = new JMenuItem("Exit");
-    exitAppMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.exit(0);
-      }
-    });
-    fileMenu.add(exitAppMenuItem);
-
+    fileMenu = createFileMenu();
     menuBar.add(fileMenu);
+    preferencesMenu = createPreferencesMenu();
+    menuBar.add(preferencesMenu);
     setJMenuBar(menuBar);
 
     // set up board panel
@@ -65,11 +48,57 @@ public class MainFrame extends JFrame {
     validate();
   }
 
+  private JMenu createFileMenu() {
+    JMenu fileMenu = new JMenu("File");
+    final JMenuItem loadGameMenuItem = new JMenuItem("Load game");
+    loadGameMenuItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        System.out.println("TODO: open file from pgn file.");
+      }
+    });
+    fileMenu.add(loadGameMenuItem);
+    final JMenuItem exitAppMenuItem = new JMenuItem("Exit");
+    exitAppMenuItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        System.exit(0);
+      }
+    });
+    fileMenu.add(exitAppMenuItem);
+    return fileMenu;
+  }
+
+  private JMenu createPreferencesMenu() {
+    JMenu preferencesMenu = new JMenu("Preferences");
+    final JMenuItem flipBoardMenuItem = new JMenuItem("Flip Board");
+    flipBoardMenuItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        boardPanel.setBoardDirection(boardPanel.getBoardDirection().opposite());
+        controller.visualiseGame();
+      }
+    });
+    preferencesMenu.add(flipBoardMenuItem);
+
+    preferencesMenu.addSeparator();
+
+    final JCheckBoxMenuItem legalMoveHighlighterCheckbox = new JCheckBoxMenuItem("Show legal moves", false);
+    legalMoveHighlighterCheckbox.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        boardPanel.setShowLegalMoves(legalMoveHighlighterCheckbox.isSelected());
+      }
+    });
+    preferencesMenu.add(legalMoveHighlighterCheckbox);
+    return preferencesMenu;
+  }
+
   public void visualiseGame(Game game) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        System.out.println("Game to visualise:");
+        System.out.println("Mainframe has following game to visualise:");
         game.getBoard().print();
         boardPanel.visualiseBoard(game);
       }

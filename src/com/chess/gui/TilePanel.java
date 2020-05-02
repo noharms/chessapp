@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import static com.chess.gui.AppDimensions.TILE_PANEL_DIMENSION;
 import static com.chess.model.BoardUtils.getColFromLinIdx;
@@ -16,6 +17,8 @@ import static com.chess.model.BoardUtils.getRowFromLinIdx;
 public class TilePanel extends JPanel {
 
   private final int tileID; // replace by Enum 0 to 63
+
+  private final BoardPanel parentBoardPanel;
 
   private final Coordinates tileCoors;
 
@@ -28,26 +31,41 @@ public class TilePanel extends JPanel {
                    final int tileID) {
     super(new GridBagLayout());
     this.tileID = tileID;
+    parentBoardPanel = boardPanel;
     int row = getRowFromLinIdx(tileID);
     int col = getColFromLinIdx(tileID);
     tileCoors = new Coordinates(row, col);
     setPreferredSize(TILE_PANEL_DIMENSION);
-    setTileColor();
+    fillTileColor();
     addMouseListener(new TileClickListener(this, boardPanel, tileCoors));
     validate();
   }
 
   public void draw(Board board) {
-    setTileColor();
+    fillTileColor();
+
     int row = tileID / 8;
     int col = tileID % 8;
     PieceConfig pieceConfig = board.getPieceAtCoordinates(row, col);
-    setPieceIcon(pieceConfig);
+    addPieceIcon(pieceConfig);
+
+    addLegalMoveMarker();
+
     validate();
     repaint();
   }
 
-  public void setPieceIcon(PieceConfig pieceConfig) {
+  void fillTileColor() {
+    int row = tileID / 8;
+    int col = tileID % 8;
+    if (row % 2 == 0) {
+      setBackground(col % 2 == 0 ? LIGHT_TILE_COLOR : DARK_TILE_COLOR);
+    } else {
+      setBackground(col % 2 == 0 ? DARK_TILE_COLOR : LIGHT_TILE_COLOR);
+    }
+  }
+
+  private void addPieceIcon(PieceConfig pieceConfig) {
     this.removeAll();
     if (pieceConfig == null) {
       return;
@@ -68,31 +86,27 @@ public class TilePanel extends JPanel {
     }
   }
 
-  /**
-   *  Index Convention for Board used here:
-   *
-   *           0    1    2    3   4   5    6  7    -  column ID
-   *    0      w    b    w    b   w   b    w  b
-   *    1      b    w   ...  BLACK ...
-   *    2
-   *    3
-   *    4
-   *    5
-   *    6      w    b  ...  WHITE ...
-   *    7      b    w   b    w    b   w    b  w
-   *
-   *  row ID
-   *
-   */
-  void setTileColor() {
-    int row = tileID / 8;
-    int col = tileID % 8;
-    if (row % 2 == 0) {
-      setBackground(col % 2 == 0 ? LIGHT_TILE_COLOR : DARK_TILE_COLOR);
-    } else {
-      setBackground(col % 2 == 0 ? DARK_TILE_COLOR : LIGHT_TILE_COLOR);
+  private void addLegalMoveMarker() {
+    if (parentBoardPanel.isShowLegalMoves()) {
+      Set<Move> validMovesForSelectedPiece = parentBoardPanel.getValidMovesForSelectedPiece();
+      if (validMovesForSelectedPiece == null) {
+        return;
+      }
+      for (Move move : validMovesForSelectedPiece) {
+        if (this.getTileCoors().equals(move.getNewPos())) {
+          try {
+            final File file = new File(".\\resources\\green_dot.png");
+            final BufferedImage image = ImageIO.read(file);
+            this.add(new JLabel(new ImageIcon(image)));
+            add(new JLabel());
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      }
     }
   }
+
 
 
   public Coordinates getTileCoors() {

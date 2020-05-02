@@ -4,9 +4,6 @@ import com.chess.model.*;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -26,39 +23,37 @@ public class TileClickListener implements MouseListener {
   @Override
   public void mouseClicked(MouseEvent e) {
     // let controller get relevant infos of that tile from data storage
-    PieceConfig pieceConfig = boardPanel.controller.getPieceAtCoors(coors);
+    PieceConfig pieceOnThisTile = boardPanel.controller.getPieceAtCoors(coors);
     Player playerToMove = boardPanel.controller.getPlayerToMove();
 
     // set user selected tiles in boardPanel
     if (isRightMouseButton(e)) {
 
       boardPanel.setSelectedSourceTile(null);
-      boardPanel.setSelectedDestinationTile(null);
+      boardPanel.setValidMovesForSelectedPiece(null);
       boardPanel.setSelectedMove(null);
 
     } else if (isLeftMouseButton(e)) {
 
-      TilePanel srcTile = boardPanel.getSelectedSourceTile();
-      boardPanel.setSelectedDestinationTile(null);
       boardPanel.setSelectedMove(null);
 
-      if (srcTile == null) {
+      if (boardPanel.getSelectedSourceTile() == null) {
 
-        if (pieceConfig == null || pieceConfig.getPlayer() != playerToMove) {
-          // do nothing, so srtTile and dstTile remain null
+        if (pieceOnThisTile == null || pieceOnThisTile.getPlayer() != playerToMove) {
+          boardPanel.setValidMovesForSelectedPiece(null);
         } else {
           boardPanel.setSelectedSourceTile(tilePanel);
+          Coordinates srcCoors = boardPanel.getSelectedSourceTile().getTileCoors();
+          boardPanel.setValidMovesForSelectedPiece(boardPanel.controller.getValidMoves(srcCoors));
           System.out.println("selecting as src tile:" + ", r:" + coors.row + ", c: " + coors.col);
+          System.out.println("--> we have " + boardPanel.getValidMovesForSelectedPiece().size() + " valid moves.");
         }
 
       } else { // srcTile != null
 
-        Coordinates srcCoors = boardPanel.getSelectedSourceTile().getTileCoors();
-        List<Move> validMoves = new ArrayList<>(boardPanel.controller.getValidMoves(srcCoors));
-        for (Move move : validMoves) {
+        for (Move move : boardPanel.getValidMovesForSelectedPiece()) {
           if (boardPanel.getSelectedSourceTile().getTileCoors().equals(move.getOldPos())
                   && coors.equals(move.getNewPos())) {
-            boardPanel.setSelectedDestinationTile(tilePanel);
             boardPanel.setSelectedMove(new Move(move));
             System.out.println("selecting as dst tile:" + ", r:" + coors.row + ", c: " + coors.col);
             break;
@@ -73,6 +68,7 @@ public class TileClickListener implements MouseListener {
       boardPanel.controller.applySelectedMove();
     }
 
+    boardPanel.controller.visualiseGame(); // every click leads to new rendering of board
   }
 
   @Override
